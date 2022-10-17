@@ -1,10 +1,32 @@
-// Построение суффиксного массива за O(n * log^2(n))
-
+// Построение суффиксного массива за O(n * log(n))
 #include <iostream>
 #include <vector>
 #include <algorithm>
 
 using namespace std;
+
+void count_sort(vector<int> &p, vector<int> &c)
+{
+    int n = p.size();
+    vector<int> cnt(n);
+    for (auto x : c)
+    {
+        cnt[x]++;
+    }
+    vector<int> p_new(n), pos(n);
+    pos[0] = 0;
+    for (int i = 1; i < n; i++)
+    {
+        pos[i] = pos[i - 1] + cnt[i - 1];
+    }
+    for (auto x : p)
+    {
+        int i = c[x];
+        p_new[pos[i]] = x;
+        pos[i]++;
+    }
+    p = p_new;
+}
 
 int main()
 {
@@ -12,7 +34,6 @@ int main()
     cin.tie(0);
     cout.tie(0);
 
-    
     string str;
     cin >> str;
     str += "&";
@@ -45,29 +66,30 @@ int main()
     int k = 0;
     while ((1 << k) < len)
     {
-        vector<pair<pair<int, int>, int>> a(len);
+        for (int i = 0; i < len; i++)
+        {
+            p[i] = (p[i] - (1 << k) + len) % len;
+        }
 
-        for (int i = 0; i < len; i++)
-        {
-            a[i] = {{c[i], c[(i + (1 << k)) % len]}, i};
-        }
-        sort(a.begin(), a.end());
-        for (int i = 0; i < len; i++)
-        {
-            p[i] = a[i].second;
-        }
-        c[p[0]] = 0;
+        count_sort(p, c);
+
+        vector<int> c_new(len);
+        c_new[p[0]]=0;
+
         for (int i = 1; i < len; i++)
         {
-            if (a[i].first == a[i - 1].first)
+            pair<int, int> prev = {c[p[i-1]],c[(p[i-1]+(1<<k))%len]};
+            pair<int, int> now = {c[p[i]],c[(p[i]+(1<<k))%len]};
+            if (now == prev)
             {
-                c[p[i]] = c[p[i - 1]];
+                c_new[p[i]] = c_new[p[i - 1]];
             }
             else
             {
-                c[p[i]] = c[p[i - 1]] + 1;
+                c_new[p[i]] = c_new[p[i - 1]] + 1;
             }
         }
+        c = c_new;
         k++;
     }
 
