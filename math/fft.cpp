@@ -77,7 +77,7 @@ void solve() {
     for (int i = 0; i < n; i++) cin >> a[i];
     for (int i = 0; i < m; i++) cin >> b[i];
 
-    s = 1; while (s < n * m) s <<= 1;
+    s = 1; while (s < n + m - 1) s <<= 1;
     a.resize(s); b.resize(s);
 
     vector<int> fa = fft(a), fb = fft(b), fc(fa.size());
